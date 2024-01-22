@@ -2,9 +2,11 @@
 using APi.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 
 namespace ConsumeApi.Controllers
 {
@@ -77,7 +79,7 @@ namespace ConsumeApi.Controllers
                         }
                         else
                         {
-                            HttpResponseMessage response = client.PostAsync("/Customer/UpdateCustomer", ContentData).Result;
+                            HttpResponseMessage response = client.PutAsync("/Customer/UpdateCustomer", ContentData).Result;
                             TempData["success"] = response.Content.ReadAsStringAsync().Result;
                         }
                     }
@@ -114,6 +116,32 @@ namespace ConsumeApi.Controllers
                 }
             }
             return RedirectToAction("Index");
+        }
+
+        public IActionResult Edit(int id)
+        {
+            Customer cus = new Customer();
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(localUrl);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage response = client.GetAsync("/Customer/GetCustomerId/" + id).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string stringData = response.Content.ReadAsStringAsync().Result;
+                    cus = System.Text.Json.JsonSerializer.Deserialize<Customer>(stringData, new JsonSerializerOptions()
+                    { PropertyNameCaseInsensitive = true });
+                }
+                else
+                {
+                    TempData["error"] = $"{response.ReasonPhrase}";
+                }
+
+
+
             }
+            return View("AddCustomer", cus);
         }
     }
+}
