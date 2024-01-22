@@ -69,7 +69,7 @@ namespace APi.Controllers
             {
                 var cus = _context.customers.Add(model);
                 _context.SaveChanges();
-                return Ok(cus);
+                return Ok("Record inserted Sucessfully!");
             }
         }
 
@@ -96,7 +96,7 @@ namespace APi.Controllers
                     cus.IsActive = model.IsActive;
                     _context.customers.Update(cus);
                     _context.SaveChanges();
-                    return Ok(cus);
+                    return Ok("Record Updated SucessFully!KD");
                 }
             }
         }
@@ -104,32 +104,33 @@ namespace APi.Controllers
         [HttpDelete]
         [Route("DeleteCustomer/{id}")]
 
-        public IActionResult DeleteCustomer( int id)
+        public IActionResult DeleteCustomer(int id)
         {
-            if (id!=0) 
-            { 
+            if (id != 0)
+            {
                 var emp = _context.customers.Where(x => x.Id == id).SingleOrDefault();
-                
-                    if (emp == null)
-                    {
-                        return BadRequest();
-                    }
-                    else
-                    {
-                        _context.customers.Remove(emp);
-                        _context.SaveChanges();
-                        
-                    }
 
-                }
-                else { 
+                if (emp == null)
+                {
                     return BadRequest();
                 }
-                return Ok();
+                else
+                {
+                    _context.customers.Remove(emp);
+                    _context.SaveChanges();
 
-                
-                
+                }
+
             }
+            else
+            {
+                return BadRequest();
+            }
+            return Ok("Record Has Sucessfuly Deleted from DataBase!");
+
+
+
         }
     }
+}
 

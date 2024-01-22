@@ -16,3 +16,37 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/*Loader Css*/
+
+/* CSS for loader */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #333; /* Text color */
+}
+
+    .loading::before {
+        content: "";
+        border: 4px solid #333; /* Border color */
+        border-top: 4px solid transparent;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite; /* Rotation animation */
+        margin-right: 8px; /* Adjust the space between text and loader */
+    }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace ConsumeApi.Controllers
 {
@@ -47,5 +48,72 @@ namespace ConsumeApi.Controllers
             }
             return View(data);
         }
+
+
+        public IActionResult AddCustomer()
+        {
+            Customer customer = new Customer();
+            return View(customer);
+        }
+
+        [HttpPost]
+        public IActionResult AddCustomer(Customer model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(localUrl);
+                        var data = JsonConvert.SerializeObject(model);
+                        var ContentData = new StringContent(data, Encoding.UTF8, "application/json");
+
+                        if (model.Id == 0)
+                        {
+                            HttpResponseMessage response = client.PostAsync("/Customer/AddCustomer", ContentData).Result;
+                            TempData["success"] = response.Content.ReadAsStringAsync().Result;
+
+                        }
+                        else
+                        {
+                            HttpResponseMessage response = client.PostAsync("/Customer/UpdateCustomer", ContentData).Result;
+                            TempData["success"] = response.Content.ReadAsStringAsync().Result;
+                        }
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "ModelState is not Valid!");
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
+
+
+        public IActionResult Delete(int id)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(localUrl);
+                HttpResponseMessage response = client.DeleteAsync("/Customer/DeleteCustomer/" + id).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["success"] = response.Content.ReadAsStringAsync().Result;
+                }
+                else
+                {
+                    TempData["error"] = $" {response.ReasonPhrase}";
+                }
+            }
+            return RedirectToAction("Index");
+            }
+        }
     }
-}
